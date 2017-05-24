@@ -1,0 +1,9 @@
+---
+- name: test win_docker module
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: perform tests
+      block:
+        - include: tests.yml
+          where: ansible_distribution_major_version >= 10

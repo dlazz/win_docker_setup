@@ -1,0 +1,123 @@
+---
+- name: install docker
+  win_docker_setup:
+
+- name: check if docker is installed
+  win_shell: (Get-WmiObject Win32_Service -Filter "Name = 'docker'").name
+  register: docker
+
+- name: test docker setup
+  assert:
+    that:
+      - docker.stdout_lines[0] == 'docker'
+      - docker|changed
+
+- name: reinstall docker to check idempotency
+  win_docker_setup:
+  register: docker_reinstall
+
+- name: test module idempotency
+  assert:
+    that:
+      - not docker_reinstall|changed
+      - docker_reinstall.output == "Docker is already present."
+
+- name: check docker json file is removed
+  win_shell: Test-Path -Path (Join-Path -Path $env:TEMP -ChildPath "DockerMsftIndex.json")
+  register: docker_msft_index
+
+- name: test heck docker json file is removed
+  assert:
+    that:
+      docker_msft_index.stdout_lines[0] == 'False'
+
+- name: check docker archive file is removed
+  win_shell: Test-Path -Path (Join-Path -Path $env:TEMP -ChildPath "docker.zip")
+  register: docker_archive
+
+- name: test docker json file is removed
+  assert:
+    that:
+      docker_archive.stdout_lines[0] == 'False'
+
+- name: uninstall docker
+  win_docker_setup:
+    state: absent
+
+- name: check if docker is removed
+  win_shell: (Get-WmiObject Win32_Service -Filter "Name = 'docker'").name
+  register: docker_removed
+
+- name: check uninstall idempotency
+  win_docker_setup:
+    state: absent
+  register: docker_uninstall_idempotency
+
+- name: test uninstall idempotency
+  assert:
+    that:
+      - not docker_uninstall_idempotency|changed
+
+- name: test docker removal
+  assert:
+    that:
+      - docker_removed.stdout == ''
+      - docker_removed|changed
+
+- name: check docker folder is removed
+  win_shell: Test-Path -Path (Join-Path -Path $env:TEMP -ChildPath "docker")
+  register: docker_folder
+
+- name: test docker folder is removed
+  assert:
+    that:
+      - docker_folder.stdout_lines[0] == 'False'
+
+- name: install a fake version
+  win_docker_setup:
+    state: present
+    version: 13asd
+  register: fake_docker
+  ignore_errors: yes
+
+- name: install docker specific version
+  win_docker_setup:
+    state: present
+    version: 1.13-cs
+
+- name: check docker version
+  win_shell: $($(docker --version).split(' ')[2]).split('-')[0]
+  register: docker_version
+
+- name: test docker version
+  assert:
+    that:
+      - docker_version.stdout_lines[0] == "1.13.1"
+
+- name: udpate docker to the latest version
+  win_docker_setup:
+    state: update
+  register: docker_update
+
+- name: test docker is update
+  assert:
+    that:
+      - docker_update|changed
+
+- name: check update idempotency
+  win_docker_setup:
+    state: update
+  register: update_attempt
+
+- name: test docker update addempt
+  assert:
+    that:
+      - not update_attempt|changed
+      - update_attempt.output == "Docker doesn't need to be updated."
+
+- name: cleanup docker
+  win_docker_setup:
+    state: absent
+
+- debug:
+    msg: "all tests are passed!"

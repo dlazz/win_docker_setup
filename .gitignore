@@ -1,0 +1,5 @@
+.vagrant/
+Vagrantfile
+*.retry
+hosts
+test.ps1
