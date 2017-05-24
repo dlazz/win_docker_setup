@@ -32,8 +32,8 @@ version_added: "2.4"
 short_description: Add, remove or update docker for windows.
 description:
     - Add, remove or update docker for window. This script automate the setup
-      of a stable version of Docker and installs the latest stable if any version
-      is provided.
+      of a stable version of Docker and installs the latest stable if any
+      version is provided.
       'Containers' windows feature is installed if not already present.
 options:
   state:

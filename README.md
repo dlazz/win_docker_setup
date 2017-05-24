@@ -7,7 +7,7 @@
 ## Usage
 Add *library* folder to your role/playbook,
 
-####Usage examples:
+#### Usage examples:
 ```yml
 ---
 # Install the Docker latest version
@@ -32,7 +32,7 @@ Add *library* folder to your role/playbook,
   
 ``` 
 
-###Note:
+### Note:
 >This module uses Docker manual setup as described here: https://docs.docker.com/docker-ee-for-windows/install/
 
 >KB3176936 has to be previously installed. Ensure your windows server has the latest available updates.

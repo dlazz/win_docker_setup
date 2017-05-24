@@ -1,5 +1,5 @@
 ---
-- name: test win_docker module
+- name: test win_docker_setup module
   hosts: all
   gather_facts: true
   tasks:
